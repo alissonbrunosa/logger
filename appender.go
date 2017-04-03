@@ -13,13 +13,6 @@ const (
 	Reset  = 0
 )
 
-const (
-	DEBUG = "DEBUG"
-	INFO  = "INFO"
-	WARN  = "WARN"
-	ERROR = "ERROR"
-)
-
 type Appender struct {
 	Output io.Writer
 }

@@ -5,6 +5,14 @@ import (
 	"os"
 )
 
+
+const (
+	DEBUG = "DEBUG"
+	INFO  = "INFO"
+	WARN  = "WARN"
+	ERROR = "ERROR"
+)
+
 type Logger struct {
 	Appenders []*Appender
 }
