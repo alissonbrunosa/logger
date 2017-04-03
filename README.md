@@ -19,10 +19,12 @@ package main
 import "github.com/alissonbrunosa/logger"
 
 func main() {
-	logger.Debug("debug")
-	logger.Info("info")
-	logger.Warn("warn")
-	logger.Error("error")
+	log := logger.New()
+
+	log.Debug("debug")
+	log.Info("info")
+	log.Warn("warn")
+	log.Error("error")
 }
 ```
 
