@@ -2,52 +2,48 @@ package logger
 
 import (
 	"fmt"
-	"runtime"
+	"os"
 )
 
-const (
-	Cyan   = 36
-	Yellow = 33
-	Red    = 31
-	Reset  = 0
-)
-
-const (
-	DEBUG = "DEBUG"
-	INFO  = "INFO"
-	WARN  = "WARN"
-	ERROR = "ERROR"
-)
-
-func Debug(mensage interface{}) {
-	log(DEBUG, 0, mensage)
+type Logger struct {
+	Appenders []*Appender
 }
 
-func Info(mensage interface{}) {
-	log(INFO, Cyan, mensage)
+func New() *Logger {
+	file, err := os.Create("developement.log")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Logger: %v", err)
+	}
+	fileAppender := &Appender{Output: file}
+	console := &Appender{Output: os.Stdout}
+	appenders := []*Appender{fileAppender, console}
+	return &Logger{Appenders: appenders}
 }
 
-func Error(mensage interface{}) {
-	log(ERROR, Red, mensage)
+func (l *Logger) Add(appender *Appender) {
+	l.Appenders = append(l.Appenders, appender)
 }
 
-func Warn(mensage interface{}) {
-	log(WARN, Yellow, mensage)
+func (l *Logger) Debug(mensage interface{}) {
+	for _, appender := range l.Appenders {
+		appender.log(DEBUG, Reset, mensage)
+	}
 }
 
-func log(logType string, color int, mensage interface{}) {
-	fmt.Printf("%s[%s]\t- [%s] %v %s \n", format(color), logType, file(), mensage, reset())
+func (l *Logger) Info(mensage interface{}) {
+	for _, appender := range l.Appenders {
+		appender.log(INFO, Cyan, mensage)
+	}
 }
 
-func file() string {
-	_, file, _, _ := runtime.Caller(3)
-	return file
+func (l *Logger) Error(mensage interface{}) {
+	for _, appender := range l.Appenders {
+		appender.log(ERROR, Red, mensage)
+	}
 }
 
-func format(sequence int) string {
-	return fmt.Sprintf("\x1b[%d;%dm", 0, sequence)
-}
-
-func reset() string {
-	return format(Reset)
+func (l *Logger) Warn(mensage interface{}) {
+	for _, appender := range l.Appenders {
+		appender.log(ERROR, Red, mensage)
+	}
 }
