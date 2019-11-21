@@ -1,10 +1,16 @@
 package logger
 
 import (
-	"fmt"
+	"io"
 	"os"
 )
 
+const (
+	Cyan   = 36
+	Yellow = 33
+	Red    = 31
+	Reset  = 0
+)
 
 const (
 	DEBUG = "DEBUG"
@@ -13,45 +19,50 @@ const (
 	ERROR = "ERROR"
 )
 
+var Default = &Logger{
+	appenders: []*appender{
+		{output: os.Stdout},
+	},
+}
+
 type Logger struct {
-	Appenders []*Appender
+	appenders []*appender
 }
 
-func New() *Logger {
-	file, err := os.Create("developement.log")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Logger: %v", err)
+func New(outputs ...io.Writer) *Logger {
+	var appenders []*appender
+
+	for _, output := range outputs {
+		appenders = append(appenders, &appender{output: output})
 	}
-	fileAppender := &Appender{Output: file}
-	console := &Appender{Output: os.Stdout}
-	appenders := []*Appender{fileAppender, console}
-	return &Logger{Appenders: appenders}
+
+	return &Logger{appenders: appenders}
 }
 
-func (l *Logger) Add(appender *Appender) {
-	l.Appenders = append(l.Appenders, appender)
+func (l *Logger) Add(appender *appender) {
+	l.appenders = append(l.appenders, appender)
 }
 
 func (l *Logger) Debug(mensage interface{}) {
-	for _, appender := range l.Appenders {
-		appender.log(DEBUG, Reset, mensage)
+	for _, appender := range l.appenders {
+		go appender.log(DEBUG, Reset, mensage)
 	}
 }
 
 func (l *Logger) Info(mensage interface{}) {
-	for _, appender := range l.Appenders {
+	for _, appender := range l.appenders {
 		appender.log(INFO, Cyan, mensage)
 	}
 }
 
 func (l *Logger) Error(mensage interface{}) {
-	for _, appender := range l.Appenders {
+	for _, appender := range l.appenders {
 		appender.log(ERROR, Red, mensage)
 	}
 }
 
 func (l *Logger) Warn(mensage interface{}) {
-	for _, appender := range l.Appenders {
+	for _, appender := range l.appenders {
 		appender.log(ERROR, Red, mensage)
 	}
 }

@@ -6,19 +6,22 @@ import (
 	"runtime"
 )
 
-const (
-	Cyan   = 36
-	Yellow = 33
-	Red    = 31
-	Reset  = 0
-)
+const LINE_TEMPLATE = "%s[%s]\t- [%s] %v %s \n"
 
-type Appender struct {
-	Output io.Writer
+type appender struct {
+	output io.Writer
 }
 
-func (a *Appender) log(logType string, color int, mensage interface{}) {
-	fmt.Fprintf(a.Output, "%s[%s]\t- [%s] %v %s \n", format(color), logType, file(), mensage, reset())
+func (a *appender) log(logType string, color int, mensage interface{}) {
+	fmt.Fprintf(
+		a.output,
+		LINE_TEMPLATE,
+		format(color),
+		logType,
+		file(),
+		mensage,
+		reset(),
+	)
 }
 
 func file() string {
