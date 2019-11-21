@@ -45,7 +45,7 @@ func (l *Logger) Add(appender *appender) {
 
 func (l *Logger) Debug(mensage interface{}) {
 	for _, appender := range l.appenders {
-		go appender.log(DEBUG, Reset, mensage)
+		appender.log(DEBUG, Reset, mensage)
 	}
 }
 
@@ -63,6 +63,6 @@ func (l *Logger) Error(mensage interface{}) {
 
 func (l *Logger) Warn(mensage interface{}) {
 	for _, appender := range l.appenders {
-		appender.log(ERROR, Red, mensage)
+		appender.log(WARN, Yellow, mensage)
 	}
 }
